@@ -1,0 +1,17 @@
+DROP PROCEDURE IF EXISTS updateGoodsPrice;
+CREATE PROCEDURE updateGoodsPrice()
+BEGIN
+  UPDATE goods set price = original_price where end_date < current_timestamp();
+END;
+
+DROP EVENT IF EXISTS eventJob;
+CREATE EVENT eventJob 
+on schedule every 60 second 
+on completion PRESERVE
+do call updateGoodsPrice();
+
+
+
+SET GLOBAL event_scheduler = 1;
+
+ALTER EVENT eventJob ON  COMPLETION PRESERVE ENABLE; 
